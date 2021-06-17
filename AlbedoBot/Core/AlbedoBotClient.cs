@@ -27,11 +27,39 @@ namespace AlbedoBot.Core
             _lavaNode = _services.GetRequiredService<LavaNode>();
             _configService = _services.GetRequiredService<ConfigService>();
             _musicService = _services.GetRequiredService<MusicService>();
+
+            SubscribeEvents();
         }
 
         public async Task InitializeAsync()
         {
             await Task.Delay(-1);
+        }
+
+        private void SubscribeEvents()
+        {
+            _client.Ready += ReadyAsync;
+            _client.Log += LogAsync;
+            _lavaNode.OnLog += LogAsync;
+            _lavaNode.OnTrackEnded += _musicService.TrackEnded;
+        }
+
+        private async Task ReadyAsync()
+        {
+            try
+            {
+                await _lavaNode.ConnectAsync();
+                await _client.SetGameAsync(ConfigService.Config.GameStatus);
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+            }
+        }
+
+        private async Task LogAsync(LogMessage logMessage)
+        {
+            await LogService.LogAsync(logMessage);
         }
 
 
