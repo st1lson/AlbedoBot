@@ -1,7 +1,7 @@
 # **Albedo Discord Bot**
 ![Alt Text](https://github.com/st1lson/AlbedoBot/blob/main/docs/images/header.png)
 ## A Discord bot based on the popular anime series Overlord and built on C#
-## Build with: 
+## :paperclip: Build with: 
 * [Discord.Net](https://github.com/discord-net/Discord.Net) - Discord.Net library
 * [Victoria](https://github.com/Yucked/Victoria) - Victoria library
 ## :star: Features
@@ -15,7 +15,7 @@
   * You can flip a coin
   * You can roll a random number between 0 and 100
 * And much more will be added later
-## Author
+## :dragon_face: Author
 * [st1lson](https://github.com/st1lson)
-## Deepest gratitude
+## :briefcase: Deepest gratitude
 * [Yucked](https://github.com/Yucked) - Main [Victoria](https://github.com/Yucked/Victoria) contributor
