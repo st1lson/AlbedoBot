@@ -33,6 +33,13 @@ namespace AlbedoBot.Core
 
         public async Task InitializeAsync()
         {
+            await _configService.InitializeAsync();
+
+            await _client.LoginAsync(TokenType.Bot, ConfigService.Config.Token);
+            await _client.StartAsync();
+
+            await _commandHandler.InitializeAsync();
+
             await Task.Delay(-1);
         }
 
