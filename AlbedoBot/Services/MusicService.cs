@@ -135,6 +135,32 @@ namespace AlbedoBot.Services
             }
         }
 
+        public async Task<string> LeaveAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return ":no_entry_sign: **I'm not connected to a voice channel.**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    await player.StopAsync();
+                }
+
+                await _lavaNode.LeaveAsync(player.VoiceChannel);
+
+                return $":loudspeaker: **I'm successfully disconnected from the voice channel!";
+            }
+            catch (Exception exception)
+            {
+                return exception.Message;
+            }
+        }
+
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
             if (!trackEnded.Reason.ShouldPlayNext())
