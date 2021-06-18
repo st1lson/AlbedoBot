@@ -12,6 +12,7 @@ namespace AlbedoBot.Services
     public sealed class MusicService
     {
         private readonly LavaNode _lavaNode;
+        private TimeSpan _timeLeft;
 
         public MusicService(LavaNode lavaNode)
         {
@@ -69,21 +70,68 @@ namespace AlbedoBot.Services
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     player.Queue.Enqueue(track);
-                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), Color.Green);
-                    EmbedService.timeUntilPlay += track.Duration;
+                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), _timeLeft.ToString(), Color.Green);
+                    _timeLeft += track.Duration;
                     return result;
                 }
                 else
                 {
                     await player.PlayAsync(track);
-                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), Color.Green);
-                    EmbedService.timeUntilPlay += track.Duration;
+                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), _timeLeft.ToString(), Color.Green);
+                    _timeLeft += track.Duration;
                     return result;
                 }
             }
             catch (Exception exception)
             {
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
+            }
+        }
+
+        public async Task<string> SkipAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return ":no_entry_sign: **I'm not connected to a voice channel.**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player is null) return ":no_entry_sign: **Are you sure you are using a bot right now?**";
+
+                var track = player.Track;
+
+                if (player.Queue.Count == 0 && player.PlayerState == PlayerState.Playing)
+                {
+                    await player.StopAsync();
+
+                    _timeLeft -= track.Duration;
+
+                    return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
+                }
+                else if (player.Queue.Count == 0)
+                {
+                    return ":no_entry_sign: **No tracks to skip**";
+                }
+
+                try
+                {
+                    await player.SkipAsync();
+
+                    _timeLeft -= track.Duration;
+
+                    return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
+                }
+                catch (Exception exception)
+                {
+                    return exception.Message;
+                }
+            }
+            catch (Exception exception)
+            {
+                return exception.Message;
             }
         }
 

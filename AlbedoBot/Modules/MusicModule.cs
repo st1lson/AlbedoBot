@@ -43,5 +43,13 @@ namespace AlbedoBot.Modules
 
             await ReplyAsync(embed: await MusicService.PlayAsync(user, Context.Guild, trackTitle));
         }
+
+        [Command("skip")]
+
+        public async Task Skip()
+        {
+            await ReplyAsync(await MusicService.SkipAsync(Context.Guild));
+        }
+
     }
 }

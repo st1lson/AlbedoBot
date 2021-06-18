@@ -6,17 +6,20 @@ namespace AlbedoBot.Services
 {
     public static class EmbedService
     {
-        public static TimeSpan timeUntilPlay = default;
-
-        public static async Task<Embed> Embed(string action, string title, string url, int position, string duration, Color color)
+        public static async Task<Embed> Embed(string action, string title, string url, int position, string duration, string timeLeft, Color color)
         {
+            if (timeLeft.Equals(TimeSpan.Zero.ToString()))
+            {
+                timeLeft = "Now";
+            }
+
             var embed = await Task.Run(() => (new EmbedBuilder()
                 .WithTitle(action)
                 .WithDescription($"[**{title}**]({url})")
                 .WithColor(color)
                 .AddField("Position in queue", position, true)
                 .AddField("Duration", duration, true)
-                .AddField("Until play", timeUntilPlay, true)
+                .AddField("Until play", timeLeft, true)
                 .WithFooter(new EmbedFooterBuilder().Text = "Albedo bot").Build()));
 
             return embed;
