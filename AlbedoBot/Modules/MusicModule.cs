@@ -16,8 +16,7 @@ namespace AlbedoBot.Modules
         {
             var user = Context.User as SocketGuildUser;
 
-            await ReplyAsync(await MusicService.JoinAsync(Context.Guild, user.VoiceChannel,
-                Context.Channel as ITextChannel));
+            await ReplyAsync(await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel));
         }
 
         [Command("play")]
@@ -28,7 +27,7 @@ namespace AlbedoBot.Modules
 
             if (!MusicService.Joined(user.Guild))
             {
-                string joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel, 1);
+                string joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel);
 
                 await ReplyAsync(joinResult);
 
@@ -84,6 +83,13 @@ namespace AlbedoBot.Modules
         public async Task Repeat()
         {
             await ReplyAsync(await MusicService.RepeatAsync(Context.Guild));
+        }
+
+        [Command("clear")]
+
+        public async Task Clear()
+        {
+            await ReplyAsync(await MusicService.ClearAsync(Context.Guild));
         }
     }
 }

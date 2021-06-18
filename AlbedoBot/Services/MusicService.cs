@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -22,10 +22,9 @@ namespace AlbedoBot.Services
             _repeat = false;
         }
 
-
         public bool Joined(IGuild guild) => _lavaNode.HasPlayer(guild);
 
-        public async Task<string> JoinAsync(IGuild guild, SocketVoiceChannel voiceChannel, ITextChannel textChannel, int playIndex = 0)
+        public async Task<string> JoinAsync(IGuild guild, SocketVoiceChannel voiceChannel, ITextChannel textChannel)
         {
             if (_lavaNode.HasPlayer(guild))
             {
@@ -78,24 +77,20 @@ namespace AlbedoBot.Services
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     player.Queue.Enqueue(track);
-                    await LogService.InfoAsync("Added to the queue");
-                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), _timeLeft.ToString(), Color.Green);
+                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{_timeLeft:hh\\:mm\\:ss}", Color.Green);
                     _timeLeft += track.Duration;
                     return result;
                 }
                 else
                 {
                     await player.PlayAsync(track);
-                    await LogService.InfoAsync("Now playing");
-                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), _timeLeft.ToString(), Color.Green);
+                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{_timeLeft:hh\\:mm\\:ss}", Color.Green);
                     _timeLeft += track.Duration;
                     return result;
                 }
             }
             catch (Exception exception)
             {
-                await LogService.ExceptionAsync(exception);
-
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
@@ -240,13 +235,13 @@ namespace AlbedoBot.Services
 
                     int pos = 0;
 
-                    embed = await EmbedService.AppendQueue(embed, track.Title, track.Url, (track.Duration - track.Position).ToString(), pos++);
+                    embed = await EmbedService.AppendQueue(embed, track.Title, track.Url, $"{(track.Duration - track.Position):hh\\:mm\\:ss}", pos++);
 
                     if (player.Queue.Count != 0)
                     {
                         foreach (var lavaTrack in player.Queue)
                         {
-                            embed = await EmbedService.AppendQueue(embed, lavaTrack.Title, lavaTrack.Url, (lavaTrack.Duration - lavaTrack.Position).ToString(), pos++);
+                            embed = await EmbedService.AppendQueue(embed, lavaTrack.Title, lavaTrack.Url, $"{(lavaTrack.Duration - lavaTrack.Position):hh\\:mm\\:ss}", pos++);
                         }
                     }
 
@@ -327,10 +322,54 @@ namespace AlbedoBot.Services
             }
         }
 
+        public async Task<string> ClearAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return "**I'm not connected to a voice channel**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player is null) return "**Are you sure you are using a bot right now?**";
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    if (player.Queue.Count > 0)
+                    {
+                        player.Queue.Clear();
+
+                        return ":ballot_box_with_check: **Queue was successfully cleared**";
+                    }
+
+                    return ":no_entry_sign: **Queue is empty**";
+                }
+
+                return ":no_entry_sign: **Queue is empty**";
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+
+                return exception.Message;
+            }
+        }
+
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
             if (!trackEnded.Reason.ShouldPlayNext())
             {
+                return;
+            }
+
+            if (_repeat)
+            {
+                var currentTrack = trackEnded.Track;
+
+                await trackEnded.Player.PlayAsync(currentTrack);
+
                 return;
             }
 
