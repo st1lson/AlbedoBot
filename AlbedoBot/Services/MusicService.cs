@@ -42,7 +42,7 @@ namespace AlbedoBot.Services
             }
             catch (Exception exception)
             {
-                LogService.ExceptionAsync(exception);
+                await LogService.ExceptionAsync(exception);
 
                 return exception.Message;
             }
