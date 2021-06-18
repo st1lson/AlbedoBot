@@ -66,6 +66,19 @@ namespace AlbedoBot.Services
             return fields;
         }
 
+        public static async Task<Embed> NowEmbed(string action, string title, string url, string author, string duration, Color color)
+        {
+            var embed = await Task.Run(() => (new EmbedBuilder()
+                .WithTitle(action)
+                .WithDescription($"[**{title}**]({url})")
+                .WithColor(color)
+                .AddField("Duration", duration, true)
+                .AddField("Author", author, true)
+                .WithFooter(new EmbedFooterBuilder().Text = "Albedo bot").Build()));
+
+            return embed;
+        }
+
         public static async Task<Embed> ErrorEmbed(string title, string exception, Color color)
         {
             var embed = await Task.Run(() => (new EmbedBuilder()

@@ -215,6 +215,80 @@ namespace AlbedoBot.Services
             }
         }
 
+        public async Task<Embed> QueueAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return await EmbedService.ErrorEmbed("No connection", "I'm not connected to a voice channel", Color.DarkBlue);
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player is null) return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    var track = player.Track;
+
+                    var embed = new EmbedFieldBuilder[player.Queue.Count + 1];
+
+                    int pos = 0;
+
+                    embed = await EmbedService.AppendQueue(embed, track.Title, track.Url, (track.Duration - track.Position).ToString(), pos++);
+
+                    if (player.Queue.Count != 0)
+                    {
+                        foreach (var lavaTrack in player.Queue)
+                        {
+                            embed = await EmbedService.AppendQueue(embed, lavaTrack.Title, lavaTrack.Url, (lavaTrack.Duration - lavaTrack.Position).ToString(), pos++);
+                        }
+                    }
+
+                    return await EmbedService.QueueEmbed(embed);
+                }
+
+                return await EmbedService.ErrorEmbed("No connection", "No tracks in queue", Color.DarkBlue);
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+
+                return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
+            }
+        }
+
+        public async Task<Embed> NowAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return await EmbedService.ErrorEmbed("No connection", "I'm not connected to a voice channel", Color.DarkBlue);
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player is null) return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    var track = player.Track;
+
+                    return await EmbedService.NowEmbed("Now playing", track.Title, track.Url, track.Author, track.Duration.ToString(), Color.DarkGrey);
+                }
+                else
+                {
+                    return await EmbedService.ErrorEmbed("No connection", "Сurrently not playing any tracks", Color.DarkBlue);
+                }
+            }
+            catch (Exception exception)
+            {
+                return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
+            }
+        }
+
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
             if (!trackEnded.Reason.ShouldPlayNext())

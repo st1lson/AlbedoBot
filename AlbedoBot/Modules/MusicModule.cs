@@ -72,5 +72,11 @@ namespace AlbedoBot.Modules
             await ReplyAsync(embed: await MusicService.QueueAsync(Context.Guild));
         }
 
+        [Command("now")]
+
+        public async Task Now()
+        {
+            await ReplyAsync(embed: await MusicService.NowAsync(Context.Guild));
+        }
     }
 }
