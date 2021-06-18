@@ -39,7 +39,7 @@ namespace AlbedoBot.Services
             {
                 fields[position] = await Task.Run(() => (new EmbedFieldBuilder
                 {
-                    Name = "Now playing",
+                    Name = "Now playing:",
                     Value = $"**[{title}]({url})** || `Time left: {duration})`",
                     IsInline = false
                 }));
@@ -48,7 +48,7 @@ namespace AlbedoBot.Services
             {
                 fields[position] = await Task.Run(() => (new EmbedFieldBuilder
                 {
-                    Name = "In queue",
+                    Name = "In queue:",
                     Value = $"`{position}.` **[{title}]({url})** || `Time left: {duration}`",
                     IsInline = false
                 }));
@@ -57,8 +57,8 @@ namespace AlbedoBot.Services
             {
                 fields[position] = await Task.Run(() => (new EmbedFieldBuilder
                 {
-                    Name = $"`{position}.`",
-                    Value = $"**[{title}]({url})** || `Time left: {duration}`",
+                    Name = "\u200b",
+                    Value = $"`{position}.` **[{title}]({url})** || `Time left: {duration}`",
                     IsInline = false
                 }));
             }
