@@ -13,11 +13,15 @@ namespace AlbedoBot.Services
     {
         private readonly LavaNode _lavaNode;
         private TimeSpan _timeLeft;
+        private bool _repeat;
 
         public MusicService(LavaNode lavaNode)
         {
             _lavaNode = lavaNode;
+            _timeLeft = TimeSpan.Zero;
+            _repeat = false;
         }
+
 
         public bool Joined(IGuild guild) => _lavaNode.HasPlayer(guild);
 
@@ -286,6 +290,40 @@ namespace AlbedoBot.Services
             catch (Exception exception)
             {
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
+            }
+        }
+
+        public async Task<string> RepeatAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return "**I'm not connected to a voice channel**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player is null) return "**Are you sure you are using a bot right now?**";
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    var track = player.Track;
+
+                    _repeat = !_repeat;
+
+                    return _repeat ? $":ballot_box_with_check: **Track** `{track.Title}` **was successfully set to repeat**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
+                }
+                else
+                {
+                    return ":no_entry_sign: **No tracks to repeat**";
+                }
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+
+                return exception.Message;
             }
         }
 
