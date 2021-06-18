@@ -35,11 +35,15 @@ namespace AlbedoBot.Services
 
             try
             {
+                await LogService.InfoAsync("Joined");
+
                 await _lavaNode.JoinAsync(voiceChannel, textChannel);
                 return $":ballot_box_with_check: **Joined** `{voiceChannel.Name}`.";
             }
             catch (Exception exception)
             {
+                LogService.ExceptionAsync(exception);
+
                 return exception.Message;
             }
         }
@@ -70,6 +74,7 @@ namespace AlbedoBot.Services
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     player.Queue.Enqueue(track);
+                    await LogService.InfoAsync("Added to the queue");
                     var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), _timeLeft.ToString(), Color.Green);
                     _timeLeft += track.Duration;
                     return result;
@@ -77,6 +82,7 @@ namespace AlbedoBot.Services
                 else
                 {
                     await player.PlayAsync(track);
+                    await LogService.InfoAsync("Now playing");
                     var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count + 1, track.Duration.ToString(), _timeLeft.ToString(), Color.Green);
                     _timeLeft += track.Duration;
                     return result;
@@ -84,6 +90,8 @@ namespace AlbedoBot.Services
             }
             catch (Exception exception)
             {
+                await LogService.ExceptionAsync(exception);
+
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
@@ -109,6 +117,8 @@ namespace AlbedoBot.Services
 
                     _timeLeft -= track.Duration;
 
+                    await LogService.InfoAsync("was successfully skipped");
+
                     return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
                 }
                 else if (player.Queue.Count == 0)
@@ -122,6 +132,8 @@ namespace AlbedoBot.Services
 
                     _timeLeft -= track.Duration;
 
+                    await LogService.InfoAsync("was successfully skipped");
+
                     return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
                 }
                 catch (Exception exception)
@@ -131,6 +143,8 @@ namespace AlbedoBot.Services
             }
             catch (Exception exception)
             {
+                await LogService.ExceptionAsync(exception);
+
                 return exception.Message;
             }
         }
@@ -151,12 +165,52 @@ namespace AlbedoBot.Services
                     await player.StopAsync();
                 }
 
+                await LogService.InfoAsync("I'm successfully disconnected from the voice channel");
+
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
 
                 return $":loudspeaker: **I'm successfully disconnected from the voice channel!";
             }
             catch (Exception exception)
             {
+                await LogService.ExceptionAsync(exception);
+
+                return exception.Message;
+            }
+        }
+
+        public async Task<string> LeftAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return ":no_entry_sign: **I'm not connected to a voice channel.**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player is null) return ":no_entry_sign: **Are you sure you are using a bot right now?**";
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    var track = player.Track;
+
+                    var time = track.Duration - player.Track.Position;
+
+                    await LogService.InfoAsync($"Time left: {time:hh\\:mm\\:ss}");
+
+                    return $"**Time left:** `{time:hh\\:mm\\:ss}`";
+                }
+                else
+                {
+                    return ":no_entry_sign: **Сurrently not playing any tracks**";
+                }
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+
                 return exception.Message;
             }
         }
