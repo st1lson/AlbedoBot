@@ -16,6 +16,6 @@
   * You can roll a random number between 0 and 100
 * And much more will be added later
 ## :dragon_face: Author
-* [st1lson](https://github.com/st1lson)
+* [st1lson](https://github.com/st1lson) - Owner
 ## :briefcase: Deepest gratitude
 * [Yucked](https://github.com/Yucked) - Main [Victoria](https://github.com/Yucked/Victoria) contributor
