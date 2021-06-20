@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
@@ -13,13 +15,15 @@ namespace AlbedoBot.Services
     {
         private readonly LavaNode _lavaNode;
         private TimeSpan _timeLeft;
-        private bool _repeat;
+        private readonly ConcurrentDictionary<ulong, CancellationTokenSource> _disconnectTokens;
+        private readonly ConcurrentDictionary<ulong, bool> _repeatTokens;
 
         public MusicService(LavaNode lavaNode)
         {
             _lavaNode = lavaNode;
+            _disconnectTokens = new ConcurrentDictionary<ulong, CancellationTokenSource>();
+            _repeatTokens = new ConcurrentDictionary<ulong, bool>();
             _timeLeft = TimeSpan.Zero;
-            _repeat = false;
         }
 
         public bool Joined(IGuild guild) => _lavaNode.HasPlayer(guild);
@@ -74,6 +78,9 @@ namespace AlbedoBot.Services
                 }
 
                 var track = results.Tracks.FirstOrDefault();
+
+                if (track is null) return await EmbedService.ErrorEmbed("No matches found", $"No matches were found for `{trackTitle}`", Color.DarkPurple);
+                
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     player.Queue.Enqueue(track);
@@ -305,9 +312,19 @@ namespace AlbedoBot.Services
                 {
                     var track = player.Track;
 
-                    _repeat = !_repeat;
+                    if (!_repeatTokens.TryGetValue(player.VoiceChannel.Id, out var repeat))
+                    {
+                        repeat = true;
+                        _repeatTokens.TryAdd(player.VoiceChannel.Id, true);
+                    }
+                    else
+                    {
+                        _repeatTokens.TryUpdate(player.VoiceChannel.Id, !repeat, repeat);
 
-                    return _repeat ? $":ballot_box_with_check: **Track** `{track.Title}` **was successfully set to repeat**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
+                        repeat = _repeatTokens[player.VoiceChannel.Id];
+                    }
+
+                    return repeat ? $":ballot_box_with_check: **Track** `{track.Title}` **was successfully set to repeat**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
                 }
                 else
                 {
@@ -364,7 +381,7 @@ namespace AlbedoBot.Services
                 return;
             }
 
-            if (_repeat)
+            if (_repeatTokens.TryGetValue(trackEnded.Player.VoiceChannel.Id, out var repeat) && repeat)
             {
                 var currentTrack = trackEnded.Track;
 
@@ -375,10 +392,50 @@ namespace AlbedoBot.Services
 
             if (!trackEnded.Player.Queue.TryDequeue(out var track))
             {
+                _ = InitiateDisconnectAsync(trackEnded.Player, TimeSpan.FromSeconds(10));
+
                 return;
             }
 
             await trackEnded.Player.PlayAsync(track);
+        }
+
+        public async Task TrackStarted(TrackStartEventArgs trackStrated)
+        {
+            if (!_disconnectTokens.TryGetValue(trackStrated.Player.VoiceChannel.Id, out var value))
+            {
+                return;
+            }
+
+            if (value.IsCancellationRequested)
+            {
+                return;
+            }
+
+            value.Cancel(true);
+            await LogService.InfoAsync("Auto disconnect has been cancelled!");
+        }
+
+        private async Task InitiateDisconnectAsync(LavaPlayer player, TimeSpan timeSpan)
+        {
+            if (!_disconnectTokens.TryGetValue(player.VoiceChannel.Id, out var value))
+            {
+                value = new CancellationTokenSource();
+                _disconnectTokens.TryAdd(player.VoiceChannel.Id, value);
+            }
+            else if (value.IsCancellationRequested)
+            {
+                _disconnectTokens.TryUpdate(player.VoiceChannel.Id, new CancellationTokenSource(), value);
+                value = _disconnectTokens[player.VoiceChannel.Id];
+            }
+
+            var isCancelled = SpinWait.SpinUntil(() => value.IsCancellationRequested, timeSpan);
+            if (isCancelled)
+            {
+                return;
+            }
+
+            await _lavaNode.LeaveAsync(player.VoiceChannel);
         }
     }
 }
