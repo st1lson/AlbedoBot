@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,16 +15,16 @@ namespace AlbedoBot.Services
     public sealed class MusicService
     {
         private readonly LavaNode _lavaNode;
-        private TimeSpan _timeLeft;
+        private readonly Dictionary<ulong, TimeSpan> _timeLeft;
         private readonly ConcurrentDictionary<ulong, CancellationTokenSource> _disconnectTokens;
         private readonly ConcurrentDictionary<ulong, bool> _repeatTokens;
 
         public MusicService(LavaNode lavaNode)
         {
             _lavaNode = lavaNode;
+            _timeLeft = new Dictionary<ulong, TimeSpan>();
             _disconnectTokens = new ConcurrentDictionary<ulong, CancellationTokenSource>();
             _repeatTokens = new ConcurrentDictionary<ulong, bool>();
-            _timeLeft = TimeSpan.Zero;
         }
 
         public bool Joined(IGuild guild) => _lavaNode.HasPlayer(guild);
@@ -84,15 +85,26 @@ namespace AlbedoBot.Services
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     player.Queue.Enqueue(track);
-                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{_timeLeft:hh\\:mm\\:ss}", Color.Green);
-                    _timeLeft += track.Duration;
+                    if (_timeLeft.TryGetValue(player.VoiceChannel.Id, out var timeLeft))
+                    {
+                        _timeLeft[player.VoiceChannel.Id] = timeLeft + track.Duration;
+                    }
+                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{(timeLeft - player.Track.Position):hh\\:mm\\:ss}", Color.Green);
                     return result;
                 }
                 else
                 {
                     await player.PlayAsync(track);
+                    if (!_timeLeft.TryGetValue(player.VoiceChannel.Id, out var timeLeft))
+                    {
+                        timeLeft = track.Duration;
+                        _timeLeft.TryAdd(player.VoiceChannel.Id, timeLeft);
+                    }
+                    else
+                    {
+                        _timeLeft[player.VoiceChannel.Id] = TimeSpan.Zero;
+                    }
                     var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{_timeLeft:hh\\:mm\\:ss}", Color.Green);
-                    _timeLeft += track.Duration;
                     return result;
                 }
             }
@@ -117,12 +129,21 @@ namespace AlbedoBot.Services
 
                 var track = player.Track;
 
+                if (!_timeLeft.TryGetValue(player.VoiceChannel.Id, out var timeLeft))
+                {
+                    timeLeft = TimeSpan.Zero;
+                    _timeLeft.TryAdd(player.VoiceChannel.Id, timeLeft);
+                }
+                else
+                {
+                    _timeLeft[player.VoiceChannel.Id] = timeLeft - player.Track.Duration;
+                }
+
+                
                 if (player.Queue.Count == 0 && player.PlayerState == PlayerState.Playing)
                 {
                     await player.StopAsync();
-
-                    _timeLeft -= track.Duration;
-
+                    
                     await LogService.InfoAsync("was successfully skipped");
 
                     return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
@@ -135,8 +156,6 @@ namespace AlbedoBot.Services
                 try
                 {
                     await player.SkipAsync();
-
-                    _timeLeft -= track.Duration;
 
                     await LogService.InfoAsync("was successfully skipped");
 
@@ -358,6 +377,9 @@ namespace AlbedoBot.Services
                     {
                         player.Queue.Clear();
 
+                        _timeLeft.TryGetValue(player.VoiceChannel.Id, out _);
+                        _timeLeft[player.VoiceChannel.Id] = player.Track.Duration;
+                        
                         return ":ballot_box_with_check: **Queue was successfully cleared**";
                     }
 
