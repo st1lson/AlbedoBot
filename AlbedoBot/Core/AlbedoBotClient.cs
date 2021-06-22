@@ -67,7 +67,7 @@ namespace AlbedoBot.Core
 
         private async Task LogAsync(LogMessage logMessage)
         {
-            await LogService.LogAsync(logMessage);
+            await LogService.LogAsync(logMessage.Message);
         }
 
 

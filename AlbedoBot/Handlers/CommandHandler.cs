@@ -37,7 +37,7 @@ namespace AlbedoBot.Handlers
 
         private async Task LogAsync(LogMessage logMessage)
         {
-            await LogService.LogAsync(logMessage);
+            await LogService.LogAsync(logMessage.Message);
         }
 
         private Task HandleCommandAsync(SocketMessage socketMessage)

@@ -16,6 +16,8 @@ namespace AlbedoBot.Modules
         {
             var user = Context.User as SocketGuildUser;
 
+            if (user is null) return;
+            
             await ReplyAsync(await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel));
         }
 
@@ -25,6 +27,8 @@ namespace AlbedoBot.Modules
         {
             var user = Context.User as SocketGuildUser;
 
+            if (user is null) return;
+            
             if (!MusicService.Joined(user.Guild))
             {
                 string joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel);

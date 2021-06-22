@@ -19,6 +19,12 @@ namespace AlbedoBot.Modules
 
         public async Task Roll([Remainder] int upper = 100)
         {
+            if (upper <= 0)
+            {
+                await ReplyAsync(":no_entry_sign: **Impossible operation**");
+                return;
+            }
+            
             Random random = new Random();
 
             await ReplyAsync($"**You got** `{random.Next(upper)}/{upper}`");
