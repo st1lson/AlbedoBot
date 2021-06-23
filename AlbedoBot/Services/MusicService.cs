@@ -104,16 +104,77 @@ namespace AlbedoBot.Services
                     {
                         _timeLeft[player.VoiceChannel.Id] = TimeSpan.Zero;
                     }
-                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{_timeLeft:hh\\:mm\\:ss}", Color.Green);
+                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{TimeSpan.Zero:hh\\:mm\\:ss}", Color.Green);
                     return result;
                 }
             }
             catch (Exception exception)
             {
+                await LogService.ExceptionAsync(exception);
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
 
+        public async Task<string> PauseAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return ":no_entry_sign: **I'm not connected to a voice channel.**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+
+                if (player.PlayerState is PlayerState.Playing)
+                {
+                    await player.PauseAsync();
+                    return ":pause_button: **Paused**";
+                }
+                else if (player.PlayerState is PlayerState.Paused)
+                {
+                    return ":ballot_box_with_check: **Player already paused**";
+                }
+
+                return ":no_entry_sign: **No tracks to pause**";
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+                return exception.Message;
+            }
+        }
+
+        public async Task<string> ResumeAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return ":no_entry_sign: **I'm not connected to a voice channel.**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+                
+                if (player.PlayerState is PlayerState.Paused)
+                {
+                    await player.ResumeAsync();
+                    return ":arrow_forward: **Resumed**";
+                }
+                else if (player.PlayerState is PlayerState.Playing)
+                {
+                    return ":ballot_box_with_check: **Player already resumed**";
+                }
+                
+                return ":no_entry_sign: **No tracks to resume**";
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+                return exception.Message;
+            }
+        }
+        
         public async Task<string> SkipAsync(IGuild guild)
         {
             if (!_lavaNode.HasPlayer(guild))
@@ -190,16 +251,13 @@ namespace AlbedoBot.Services
                     await player.StopAsync();
                 }
 
-                await LogService.InfoAsync("I'm successfully disconnected from the voice channel");
-
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
 
-                return $":loudspeaker: **I'm successfully disconnected from the voice channel!";
+                return $":loudspeaker: **I'm successfully disconnected from the voice channel!**";
             }
             catch (Exception exception)
             {
                 await LogService.ExceptionAsync(exception);
-
                 return exception.Message;
             }
         }
@@ -235,7 +293,6 @@ namespace AlbedoBot.Services
             catch (Exception exception)
             {
                 await LogService.ExceptionAsync(exception);
-
                 return exception.Message;
             }
         }
@@ -258,7 +315,7 @@ namespace AlbedoBot.Services
                     var track = player.Track;
 
                     var embed = new EmbedFieldBuilder[player.Queue.Count + 1];
-
+                    
                     int pos = 0;
 
                     embed = await EmbedService.AppendQueue(embed, track.Title, track.Url, $"{(track.Duration - track.Position):hh\\:mm\\:ss}", pos++);
@@ -279,7 +336,6 @@ namespace AlbedoBot.Services
             catch (Exception exception)
             {
                 await LogService.ExceptionAsync(exception);
-
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
@@ -310,6 +366,7 @@ namespace AlbedoBot.Services
             }
             catch (Exception exception)
             {
+                await LogService.ExceptionAsync(exception);
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
@@ -328,9 +385,9 @@ namespace AlbedoBot.Services
                 if (player is null) return "**Are you sure you are using a bot right now?**";
 
                 if (player.PlayerState is PlayerState.Playing)
-                {
+                {                    
                     var track = player.Track;
-
+                    
                     if (!_repeatTokens.TryGetValue(player.VoiceChannel.Id, out var repeat))
                     {
                         repeat = true;
@@ -342,7 +399,6 @@ namespace AlbedoBot.Services
 
                         repeat = _repeatTokens[player.VoiceChannel.Id];
                     }
-
                     return repeat ? $":ballot_box_with_check: **Track** `{track.Title}` **was successfully set to repeat**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
                 }
                 else
@@ -353,7 +409,6 @@ namespace AlbedoBot.Services
             catch (Exception exception)
             {
                 await LogService.ExceptionAsync(exception);
-
                 return exception.Message;
             }
         }
@@ -385,17 +440,16 @@ namespace AlbedoBot.Services
 
                     return ":no_entry_sign: **Queue is empty**";
                 }
-
+                
                 return ":no_entry_sign: **Queue is empty**";
             }
             catch (Exception exception)
             {
                 await LogService.ExceptionAsync(exception);
-
                 return exception.Message;
             }
         }
-
+        
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
             if (!trackEnded.Reason.ShouldPlayNext())
@@ -414,17 +468,17 @@ namespace AlbedoBot.Services
 
             if (!trackEnded.Player.Queue.TryDequeue(out var track))
             {
-                _ = InitiateDisconnectAsync(trackEnded.Player, TimeSpan.FromSeconds(10));
-
+                await InitiateDisconnectAsync(trackEnded.Player, TimeSpan.FromMinutes(5));
+                
                 return;
             }
 
             await trackEnded.Player.PlayAsync(track);
         }
 
-        public async Task TrackStarted(TrackStartEventArgs trackStrated)
+        public async Task TrackStarted(TrackStartEventArgs trackStarted)
         {
-            if (!_disconnectTokens.TryGetValue(trackStrated.Player.VoiceChannel.Id, out var value))
+            if (!_disconnectTokens.TryGetValue(trackStarted.Player.VoiceChannel.Id, out var value))
             {
                 return;
             }
