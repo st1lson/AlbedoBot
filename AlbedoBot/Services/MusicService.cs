@@ -287,7 +287,7 @@ namespace AlbedoBot.Services
                 }
                 else
                 {
-                    return ":no_entry_sign: **Сurrently not playing any tracks**";
+                    return ":no_entry_sign: **Currently not playing any tracks**";
                 }
             }
             catch (Exception exception)
@@ -361,7 +361,7 @@ namespace AlbedoBot.Services
                 }
                 else
                 {
-                    return await EmbedService.ErrorEmbed("No connection", "Сurrently not playing any tracks", Color.DarkBlue);
+                    return await EmbedService.ErrorEmbed("No connection", "Currently not playing any tracks", Color.DarkBlue);
                 }
             }
             catch (Exception exception)
