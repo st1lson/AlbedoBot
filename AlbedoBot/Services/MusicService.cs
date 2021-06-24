@@ -89,8 +89,8 @@ namespace AlbedoBot.Services
                     {
                         _timeLeft[player.VoiceChannel.Id] = timeLeft + track.Duration;
                     }
-                    var result = await EmbedService.Embed("Added to the queue", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{(timeLeft - player.Track.Position):hh\\:mm\\:ss}", Color.Green);
-                    return result;
+                    
+                    return await EmbedService.Embed("Added to the queue", track.Title, track.Url, YouTubeService.GetThumbnail(track.Url), player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{(timeLeft - player.Track.Position):hh\\:mm\\:ss}", Color.Green);
                 }
                 else
                 {
@@ -104,8 +104,8 @@ namespace AlbedoBot.Services
                     {
                         _timeLeft[player.VoiceChannel.Id] = TimeSpan.Zero;
                     }
-                    var result = await EmbedService.Embed("Now playing", track.Title, track.Url, player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{TimeSpan.Zero:hh\\:mm\\:ss}", Color.Green);
-                    return result;
+                    
+                    return  await EmbedService.Embed("Now playing", track.Title, track.Url, YouTubeService.GetThumbnail(track.Url), player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{TimeSpan.Zero:hh\\:mm\\:ss}", Color.Green);
                 }
             }
             catch (Exception exception)

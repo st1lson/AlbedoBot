@@ -6,7 +6,7 @@ namespace AlbedoBot.Services
 {
     public static class EmbedService
     {
-        public static async Task<Embed> Embed(string action, string title, string url, int position, string duration, string timeLeft, Color color)
+        public static async Task<Embed> Embed(string action, string title, string url, string thumbnailUrl, int position, string duration, string timeLeft, Color color)
         {
             if (timeLeft.Equals(TimeSpan.Zero.ToString()))
             {
@@ -15,6 +15,7 @@ namespace AlbedoBot.Services
 
             var embed = await Task.Run(() => (new EmbedBuilder()
                 .WithTitle(action)
+                .WithThumbnailUrl(thumbnailUrl)
                 .WithDescription($"[**{title}**]({url})")
                 .WithColor(color)
                 .AddField("Position in queue", position, true)
