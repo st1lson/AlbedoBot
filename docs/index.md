@@ -1,17 +1,21 @@
 ## Commands
 
 * Music module commands
-  * Command `join` used to join bot to your voice channel
-  * Command `play` (or alias `p`, `track`) used to play a track
-  * Command `pause` (or alias `stop`) used to pause current track
-  * Command `resume` (or alias `continue`) used resume paused track
-  * Command `skip` (or alias `s`, `next`) used skip current track
-  * Command `leave` used to force the bot to leave current voice channel
-  * Command `queue` (or alias `tracks`, `list`) used to check the queue content
-  * Command `left` (or alias `time`) used to check the time to the end of the current track
-  * Command `now` (or alias `current`, `playing`) used to check the current track information
-  * Command `repeat` (or alias `loop`) used to repeat the current track
-  * Command `clear` used to clear the tracks queue
+  * Command ***!join*** used to join bot to your voice channel
+  * Command ***!play*** (or alias ***!p***, ***!track***) used to play a track
+  * Command ***!pause*** (or alias ***!stop***) used to pause current track
+  * Command ***!resume*** (or alias ***!continue***) used resume paused track
+  * Command ***!skip*** (or alias ***!s***, ***!next***) used skip current track
+  * Command ***!leave*** used to force the bot to leave current voice channel
+  * Command ***!queue*** (or alias ***!tracks***, ***!list***) used to check the queue content
+  * Command ***!left*** (or alias ***!time***) used to check the time to the end of the current track
+  * Command ***!now*** (or alias ***!current***, ***!playing***) used to check the current track information
+  * Command ***!repeat*** (or alias ***!loop***) used to repeat the current track
+  * Command ***!clear*** used to clear the tracks queue
+* Text module commands
+  * Command ***!hi*** (or alias ***!hello***) simple hello command
+  * Command ***!roll*** (or alias ***!spin***) used to get a random value in selected range
+  * Command ***!flip*** (or alias ***!coin***) used to get a random side of the coin
 
 ## Features
 * Intuitive command syntax 
