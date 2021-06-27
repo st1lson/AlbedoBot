@@ -1,4 +1,4 @@
-## :open_file_folder: Commands
+## Commands
 
 * Music module commands
   * Command `join` used to join bot to your voice channel
@@ -13,7 +13,7 @@
   * Command `repeat` (or alias `loop`) used to repeat the current track
   * Command `clear` used to clear the tracks queue
 
-## :star: Features
+## Features
 * Intuitive command syntax 
 * Music commands that allow you to play songs through voice channels in the [Discord](https://discord.com/) server.
   * Autoplay the next track in the queue after the end of the current one
