@@ -7,6 +7,8 @@ namespace AlbedoBot.Modules
     public sealed class TextModules : ModuleBase<SocketCommandContext>
     {
         [Command("hi")]
+        [Alias("hello")]
+        [Summary("Simple hello command")]
 
         public async Task Hello()
         {
@@ -16,6 +18,8 @@ namespace AlbedoBot.Modules
         }
 
         [Command("roll")]
+        [Alias("spin")]
+        [Summary("Command to get a random value in selected range")]
 
         public async Task Roll([Remainder] int upper = 100)
         {
@@ -31,7 +35,9 @@ namespace AlbedoBot.Modules
         }
 
         [Command("flip")]
-
+        [Alias("coin")]
+        [Summary("Command to get a random side of the coin")]
+        
         public async Task Flip()
         {
             Random random = new Random();
