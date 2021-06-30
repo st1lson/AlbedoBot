@@ -370,6 +370,27 @@ namespace AlbedoBot.Services
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
+        
+        public async Task<string> SetVolumeAsync(IGuild guild, int volumeValue)
+        {
+            if (volumeValue < 0 || volumeValue > 200)
+            {
+                return ":no_entry_sign: **Volume value was outside of the bounds.\nThe value must be between 0 and 200!**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+                await player.UpdateVolumeAsync((ushort) volumeValue);
+                await LogService.InfoAsync($"Volume is set to {volumeValue}");
+                return $":ballot_box_with_check: **Volume is successfully set to {volumeValue}**";
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+                return exception.Message;
+            }
+        }
 
         public async Task<string> RepeatAsync(IGuild guild)
         {

@@ -65,6 +65,14 @@ namespace AlbedoBot.Modules
             await ReplyAsync(await MusicService.ResumeAsync(Context.Guild));
         }
         
+        [Command("volume")]
+        [Summary("Command to set player volume")]
+
+        public async Task Volume(int volumeValue)
+        {
+            await ReplyAsync(await MusicService.SetVolumeAsync(Context.Guild, volumeValue));
+        }
+
         [Command("skip")]
         [Alias("s", "next")]
         [Summary("Command to skip current track")]
