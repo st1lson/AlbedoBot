@@ -473,6 +473,8 @@ namespace AlbedoBot.Services
         
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
+            _timeLeft[trackEnded.Player.VoiceChannel.Id] -= trackEnded.Track.Duration;
+
             if (!trackEnded.Reason.ShouldPlayNext())
             {
                 return;
