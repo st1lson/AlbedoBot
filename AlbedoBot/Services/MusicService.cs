@@ -473,8 +473,6 @@ namespace AlbedoBot.Services
         
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
-            _timeLeft[trackEnded.Player.VoiceChannel.Id] -= trackEnded.Track.Duration;
-
             if (!trackEnded.Reason.ShouldPlayNext())
             {
                 return;
@@ -483,19 +481,17 @@ namespace AlbedoBot.Services
             if (_repeatTokens.TryGetValue(trackEnded.Player.VoiceChannel.Id, out var repeat) && repeat)
             {
                 var currentTrack = trackEnded.Track;
-
                 await trackEnded.Player.PlayAsync(currentTrack);
-
                 return;
             }
 
             if (!trackEnded.Player.Queue.TryDequeue(out var track))
             {
                 await InitiateDisconnectAsync(trackEnded.Player, TimeSpan.FromMinutes(5));
-                
                 return;
             }
 
+            _timeLeft[trackEnded.Player.VoiceChannel.Id] -= trackEnded.Track.Duration;
             await trackEnded.Player.PlayAsync(track);
         }
 
