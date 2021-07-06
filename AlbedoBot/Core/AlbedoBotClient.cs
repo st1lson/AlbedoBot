@@ -79,6 +79,7 @@ namespace AlbedoBot.Core
                 .AddSingleton<LavaNode>()
                 .AddSingleton(new LavaConfig())
                 .AddSingleton<MusicService>()
+                .AddSingleton<TicTacToeService>()
                 .AddSingleton<ConfigService>()
                 .BuildServiceProvider();
     }
