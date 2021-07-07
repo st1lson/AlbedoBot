@@ -70,10 +70,11 @@ namespace AlbedoBot.Services
 
                         if (_turn[guild.Id] == 9)
                         {
+                            await EndAsync(guild);
                             return $"{table}\n**Draw**";
                         }
 
-                        return $"{table}";
+                        return table;
                     }
 
                     await LogService.InfoAsync("This position already captured");
@@ -100,10 +101,11 @@ namespace AlbedoBot.Services
 
                         if (_turn[guild.Id] == 9)
                         {
+                            await EndAsync(guild);
                             return $"{table}\n**Draw**";
                         }
 
-                        return $"{table}";
+                        return table;
                     }
 
                     await LogService.InfoAsync("This position already captured");
@@ -113,6 +115,24 @@ namespace AlbedoBot.Services
 
             return ":no_entry_sign: **Something going wrong.**";
         }
+
+        public async Task<string> EndAsync(IGuild guild)
+        {
+            if (!_gameStarted.TryGetValue(guild.Id, out var gameStarted) || !gameStarted)
+            {
+                return "**:no_entry_sign: Game did not started**";
+            }
+
+            _gameStarted.Remove(guild.Id);
+            _turn.Remove(guild.Id);
+            _firstPlayer.Remove(guild.Id);
+            _secondPlayer.Remove(guild.Id);
+            _playerTurns.Remove(guild.Id);
+
+            await LogService.InfoAsync("TicTacToe game ended");
+            return ":ballot_box_with_check: **Game successfully ended**";
+        }
+
         private async Task<string> CreateTable(IGuild guild)
         {
             string table = "|";
