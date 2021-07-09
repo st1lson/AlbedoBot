@@ -406,9 +406,7 @@ namespace AlbedoBot.Services
                 if (player is null) return "**Are you sure you are using a bot right now?**";
 
                 if (player.PlayerState is PlayerState.Playing)
-                {                    
-                    var track = player.Track;
-                    
+                {
                     if (!_repeatTokens.TryGetValue(player.VoiceChannel.Id, out var repeat))
                     {
                         repeat = true;
@@ -420,7 +418,7 @@ namespace AlbedoBot.Services
 
                         repeat = _repeatTokens[player.VoiceChannel.Id];
                     }
-                    return repeat ? $":ballot_box_with_check: **Track** `{track.Title}` **was successfully set to repeat**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
+                    return repeat ? $":ballot_box_with_check: **Repeat was successfully enabled**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
                 }
                 else
                 {
@@ -473,8 +471,6 @@ namespace AlbedoBot.Services
         
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
-            _timeLeft[trackEnded.Player.VoiceChannel.Id] -= trackEnded.Track.Duration;
-
             if (!trackEnded.Reason.ShouldPlayNext())
             {
                 return;
@@ -483,19 +479,17 @@ namespace AlbedoBot.Services
             if (_repeatTokens.TryGetValue(trackEnded.Player.VoiceChannel.Id, out var repeat) && repeat)
             {
                 var currentTrack = trackEnded.Track;
-
                 await trackEnded.Player.PlayAsync(currentTrack);
-
                 return;
             }
-
+            
             if (!trackEnded.Player.Queue.TryDequeue(out var track))
             {
                 await InitiateDisconnectAsync(trackEnded.Player, TimeSpan.FromMinutes(5));
-                
                 return;
             }
 
+            _timeLeft[trackEnded.Player.VoiceChannel.Id] -= trackEnded.Track.Duration;
             await trackEnded.Player.PlayAsync(track);
         }
 
