@@ -60,7 +60,7 @@ namespace AlbedoBot.Services
                     {
                         playerTurns[position] = 1;
                         _turn[guild.Id]++;
-                        await LogService.InfoAsync($"Turn [{position}] was successfull.");
+                        await LogService.InfoAsync($"Turn [{position}] was successfully done.");
                         var table = await CreateTable(guild);
                         if (CheckForWin(guild))
                         {
@@ -91,7 +91,7 @@ namespace AlbedoBot.Services
                     {
                         playerTurns[position] = 2;
                         _turn[guild.Id]++;
-                        await LogService.InfoAsync($"Turn [{position}] was successfull.");
+                        await LogService.InfoAsync($"Turn [{position}] was successfully done.");
                         var table = await CreateTable(guild);
                         if (CheckForWin(guild))
                         {
@@ -150,7 +150,6 @@ namespace AlbedoBot.Services
         private async Task<string> CreateTable(IGuild guild)
         {
             var table = new StringBuilder();
-            table.Append('|');
             if (_playerTurns.TryGetValue(guild.Id, out var playerTurns))
             {
                 int n = 0;
@@ -170,7 +169,7 @@ namespace AlbedoBot.Services
                         value = "      ";
                     }
 
-                    if (n % 3 == 0 && i != 0)
+                    if (n % 3 == 0)
                     {
                         table.Append('|');
                     }
