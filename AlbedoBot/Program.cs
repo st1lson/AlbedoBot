@@ -5,6 +5,6 @@ namespace AlbedoBot
 {
     public class Program
     {
-        static Task Main(string[] args) => new AlbedoBotClient().InitializeAsync();
+        protected static Task Main(string[] args) => new AlbedoBotClient().InitializeAsync();
     }
 }

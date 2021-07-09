@@ -42,16 +42,20 @@ namespace AlbedoBot.Handlers
 
         private Task HandleCommandAsync(SocketMessage socketMessage)
         {
-            if (socketMessage is null || socketMessage.Author.IsBot) return Task.CompletedTask;
+            if (socketMessage is null || socketMessage.Author.IsBot)
+            {
+                return Task.CompletedTask;
+            }
 
             var userMessage = socketMessage as SocketUserMessage;
             int argPos = 0;
-
-            if (!userMessage.HasStringPrefix(ConfigService.Config.Prefix, ref argPos)) return Task.CompletedTask;
+            if (!userMessage.HasStringPrefix(ConfigService.Config.Prefix, ref argPos))
+            {
+                return Task.CompletedTask;
+            }
 
             var context = new SocketCommandContext(_client, userMessage);
             var result = _commands.ExecuteAsync(context, argPos, _services);
-
             return result;
         }
     }

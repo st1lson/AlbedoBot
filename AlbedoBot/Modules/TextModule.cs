@@ -13,7 +13,6 @@ namespace AlbedoBot.Modules
         public async Task Hello()
         {
             var user = Context.User;
-
             await ReplyAsync($"**Welcome back,** {user.Mention}");
         }
 
@@ -30,7 +29,6 @@ namespace AlbedoBot.Modules
             }
             
             Random random = new Random();
-
             await ReplyAsync($"**You got** `{random.Next(upper)}/{upper}`");
         }
 
@@ -41,9 +39,7 @@ namespace AlbedoBot.Modules
         public async Task Flip()
         {
             Random random = new Random();
-
             int flip = random.Next(2);
-
             if (flip == 0)
             {
                 await ReplyAsync("**Heads**");

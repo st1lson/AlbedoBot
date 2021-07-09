@@ -72,15 +72,16 @@ namespace AlbedoBot.Services
             {
                 var player = _lavaNode.GetPlayer(guild);
                 var results = await _lavaNode.SearchYouTubeAsync(trackTitle);
-
                 if (results.LoadStatus.Equals(LoadStatus.LoadFailed) || results.LoadStatus.Equals(LoadStatus.NoMatches))
                 {
                     return await EmbedService.ErrorEmbed("No matches found", $"No matches were found for `{trackTitle}`", Color.DarkPurple);
                 }
 
                 var track = results.Tracks.FirstOrDefault();
-
-                if (track is null) return await EmbedService.ErrorEmbed("No matches found", $"No matches were found for `{trackTitle}`", Color.DarkPurple);
+                if (track is null)
+                {
+                    return await EmbedService.ErrorEmbed("No matches found", $"No matches were found for `{trackTitle}`", Color.DarkPurple);
+                }
                 
                 if (player.PlayerState is PlayerState.Playing)
                 {
@@ -125,7 +126,6 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     await player.PauseAsync();
@@ -155,7 +155,6 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-                
                 if (player.PlayerState is PlayerState.Paused)
                 {
                     await player.ResumeAsync();
@@ -185,11 +184,12 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
-                if (player is null) return ":no_entry_sign: **Are you sure you are using a bot right now?**";
+                if (player is null)
+                {
+                    return ":no_entry_sign: **Are you sure you are using a bot right now?**";
+                }
 
                 var track = player.Track;
-
                 if (!_timeLeft.TryGetValue(player.VoiceChannel.Id, out var timeLeft))
                 {
                     timeLeft = TimeSpan.Zero;
@@ -199,14 +199,11 @@ namespace AlbedoBot.Services
                 {
                     _timeLeft[player.VoiceChannel.Id] = timeLeft - player.Track.Duration;
                 }
-
                 
                 if (player.Queue.Count == 0 && player.PlayerState == PlayerState.Playing)
                 {
                     await player.StopAsync();
-                    
                     await LogService.InfoAsync("was successfully skipped");
-
                     return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
                 }
                 else if (player.Queue.Count == 0)
@@ -217,9 +214,7 @@ namespace AlbedoBot.Services
                 try
                 {
                     await player.SkipAsync();
-
                     await LogService.InfoAsync("was successfully skipped");
-
                     return $":ballot_box_with_check: `{track.Title}` **was successfully skipped**";
                 }
                 catch (Exception exception)
@@ -230,7 +225,6 @@ namespace AlbedoBot.Services
             catch (Exception exception)
             {
                 await LogService.ExceptionAsync(exception);
-
                 return exception.Message;
             }
         }
@@ -245,14 +239,12 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     await player.StopAsync();
                 }
 
                 await _lavaNode.LeaveAsync(player.VoiceChannel);
-
                 return $":loudspeaker: **I'm successfully disconnected from the voice channel!**";
             }
             catch (Exception exception)
@@ -272,17 +264,16 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
-                if (player is null) return ":no_entry_sign: **Are you sure you are using a bot right now?**";
+                if (player is null)
+                {
+                    return ":no_entry_sign: **Are you sure you are using a bot right now?**";
+                }
 
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     var track = player.Track;
-
                     var time = track.Duration - player.Track.Position;
-
                     await LogService.InfoAsync($"Time left: {time:hh\\:mm\\:ss}");
-
                     return $"**Time left:** `{time:hh\\:mm\\:ss}`";
                 }
                 else
@@ -307,19 +298,17 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
-                if (player is null) return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
+                if (player is null)
+                {
+                    return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
+                }
 
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     var track = player.Track;
-
                     var embed = new EmbedFieldBuilder[player.Queue.Count + 1];
-                    
                     int pos = 0;
-
                     embed = await EmbedService.AppendQueue(embed, track.Title, track.Url, $"{(track.Duration - track.Position):hh\\:mm\\:ss}", pos++);
-
                     if (player.Queue.Count != 0)
                     {
                         foreach (var lavaTrack in player.Queue)
@@ -350,13 +339,14 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
-                if (player is null) return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
+                if (player is null)
+                {
+                    return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
+                }
 
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     var track = player.Track;
-
                     return await EmbedService.NowEmbed("Now playing", track.Title, track.Url, track.Author, track.Duration.ToString(), Color.DarkGrey);
                 }
                 else
@@ -402,8 +392,10 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
-                if (player is null) return "**Are you sure you are using a bot right now?**";
+                if (player is null)
+                {
+                    return "**Are you sure you are using a bot right now?**";
+                }
 
                 if (player.PlayerState is PlayerState.Playing)
                 {
@@ -415,9 +407,9 @@ namespace AlbedoBot.Services
                     else
                     {
                         _repeatTokens.TryUpdate(player.VoiceChannel.Id, !repeat, repeat);
-
                         repeat = _repeatTokens[player.VoiceChannel.Id];
                     }
+                    
                     return repeat ? $":ballot_box_with_check: **Repeat was successfully enabled**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
                 }
                 else
@@ -442,18 +434,18 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-
-                if (player is null) return "**Are you sure you are using a bot right now?**";
+                if (player is null)
+                {
+                    return "**Are you sure you are using a bot right now?**";
+                }
 
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     if (player.Queue.Count > 0)
                     {
                         player.Queue.Clear();
-
                         _timeLeft.TryGetValue(player.VoiceChannel.Id, out _);
                         _timeLeft[player.VoiceChannel.Id] = player.Track.Duration;
-                        
                         return ":ballot_box_with_check: **Queue was successfully cleared**";
                     }
 

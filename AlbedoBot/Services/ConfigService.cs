@@ -21,7 +21,7 @@ namespace AlbedoBot.Services
             {
                 await CreateFile();
             }
-            var data = File.ReadAllText(Path);
+            var data = await File.ReadAllTextAsync(Path);
             Config = JsonConvert.DeserializeObject<Config>(data);
         }
 

@@ -22,7 +22,7 @@ namespace AlbedoBot.Services
                 .AddField("Duration", duration, true)
                 .AddField("Until play", timeLeft, true)
                 .WithFooter(new EmbedFooterBuilder().Text = "Albedo bot").Build()));
-
+            
             return embed;
         }
 

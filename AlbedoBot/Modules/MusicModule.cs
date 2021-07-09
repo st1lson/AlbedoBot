@@ -16,8 +16,10 @@ namespace AlbedoBot.Modules
         public async Task Join()
         {
             var user = Context.User as SocketGuildUser;
-
-            if (user is null) return;
+            if (user is null)
+            {
+                return;
+            }
             
             await ReplyAsync(await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel));
         }
@@ -29,13 +31,10 @@ namespace AlbedoBot.Modules
         public async Task Play([Remainder] string trackTitle)
         {
             var user = Context.User as SocketGuildUser;
-
             if (user is not null && !MusicService.Joined(user.Guild))
             {
                 var joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel);
-
                 await ReplyAsync(joinResult);
-
                 if (joinResult.Equals(":no_entry_sign: **You need to join to a voice channel!**") || joinResult.Equals(":no_entry_sign: **I'm already connected to a voice channel!**"))
                 {
                     return;
@@ -43,7 +42,6 @@ namespace AlbedoBot.Modules
             }
 
             await ReplyAsync($"**Searching** :mag: `{trackTitle}`");
-
             await ReplyAsync(embed: await MusicService.PlayAsync(user, Context.Guild, trackTitle));
         }
 

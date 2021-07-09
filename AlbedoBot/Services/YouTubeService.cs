@@ -7,8 +7,10 @@ namespace AlbedoBot.Services
         public static string GetThumbnail(string url)
         {
             string thumbnail = string.Empty;
-
-            if (url.Equals(string.Empty)) return thumbnail;
+            if (url.Equals(string.Empty))
+            {
+                return thumbnail;
+            }
 
             if (url.IndexOf("=", StringComparison.Ordinal) > 0)
             {
