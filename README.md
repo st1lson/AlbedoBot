@@ -1,7 +1,4 @@
 # **Albedo Discord Bot**
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d48dc341d0bd4e41adb9e182ad5202aa)](https://app.codacy.com/gh/st1lson/AlbedoBot?utm_source=github.com&utm_medium=referral&utm_content=st1lson/AlbedoBot&utm_campaign=Badge_Grade_Settings)
-
 ![Alt Text](https://github.com/st1lson/AlbedoBot/blob/main/docs/images/header.png)
 ## A Discord bot based on the popular anime series Overlord and built on C#
 ## :paperclip: Build with 
