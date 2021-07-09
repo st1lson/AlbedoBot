@@ -1,6 +1,6 @@
 ﻿using Discord;
-using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AlbedoBot.Services
@@ -64,8 +64,8 @@ namespace AlbedoBot.Services
                         var table = await CreateTable(guild);
                         if (CheckForWin(guild))
                         {
-                            await LogService.InfoAsync($"Winner is {firstPlayer.Nickname}");
-                            return $"{table}\n**Winner is **{firstPlayer.Mention}";
+                            await LogService.InfoAsync($"Winner is {firstPlayer?.Nickname}");
+                            return $"{table}\n**Winner is **{firstPlayer?.Mention}";
                         }
 
                         if (_turn[guild.Id] == 9)
@@ -95,8 +95,8 @@ namespace AlbedoBot.Services
                         var table = await CreateTable(guild);
                         if (CheckForWin(guild))
                         {
-                            await LogService.InfoAsync($"Winner is {secondPlayer.Nickname}");
-                            return $"{table}**Winner is **{secondPlayer.Mention}";
+                            await LogService.InfoAsync($"Winner is {secondPlayer?.Nickname}");
+                            return $"{table}**Winner is **{secondPlayer?.Mention}";
                         }
 
                         if (_turn[guild.Id] == 9)
@@ -149,14 +149,14 @@ namespace AlbedoBot.Services
 
         private async Task<string> CreateTable(IGuild guild)
         {
-            string table = "|";
-
+            var table = new StringBuilder();
+            table.Append('|');
             if (_playerTurns.TryGetValue(guild.Id, out var playerTurns))
             {
                 int n = 0;
                 for (int i = 0; i < playerTurns.GetLength(0); i++)
                 {
-                    string value = String.Empty;
+                    string value;
                     if (playerTurns[i] == 1)
                     {
                         value = ":x:";
@@ -172,19 +172,19 @@ namespace AlbedoBot.Services
 
                     if (n % 3 == 0 && i != 0)
                     {
-                        table += "|";
+                        table.Append('|');
                     }
-                    table += $" {value} |";
+                    table.Append($" {value} |");
                     n++;
                     if (n % 3 == 0)
                     {
-                        table += "\n";
+                        table.Append('\n');
                     }
                 }
             }
 
             await LogService.InfoAsync("TicTacToe table created");
-            return table;
+            return table.ToString();
         }
 
         private bool CheckForWin(IGuild guild)
@@ -197,17 +197,14 @@ namespace AlbedoBot.Services
                     int second = 0;
                     for (int i = 0; i < 3; i++)
                     {
-                        if (playerTurns[winState[i]] == 0)
+                        switch (playerTurns[winState[i]])
                         {
-                            continue;
-                        }
-                        else if (playerTurns[winState[i]] == 1)
-                        {
-                            first++;
-                        }
-                        else if (playerTurns[winState[i]] == 2)
-                        {
-                            second++;
+                            case 1:
+                                first++;
+                                break;
+                            case 2:
+                                second++;
+                                break;
                         }
                     }
 
@@ -224,14 +221,14 @@ namespace AlbedoBot.Services
         private int[][] InitializeWinState()
         {
             int[][] winState = new int[8][];
-            winState[0] = new int[] { 0, 1, 2 };
-            winState[1] = new int[] { 3, 4, 5 };
-            winState[2] = new int[] { 6, 7, 8 };
-            winState[3] = new int[] { 0, 3, 6 };
-            winState[4] = new int[] { 1, 4, 7 };
-            winState[5] = new int[] { 2, 5, 8 };
-            winState[6] = new int[] { 0, 4, 8 };
-            winState[7] = new int[] { 2, 4, 6 };
+            winState[0] = new[] { 0, 1, 2 };
+            winState[1] = new[] { 3, 4, 5 };
+            winState[2] = new[] { 6, 7, 8 };
+            winState[3] = new[] { 0, 3, 6 };
+            winState[4] = new[] { 1, 4, 7 };
+            winState[5] = new[] { 2, 5, 8 };
+            winState[6] = new[] { 0, 4, 8 };
+            winState[7] = new[] { 2, 4, 6 };
 
             return winState;
         }
