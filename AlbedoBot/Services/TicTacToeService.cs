@@ -116,6 +116,20 @@ namespace AlbedoBot.Services
             return ":no_entry_sign: **Something going wrong.**";
         }
 
+        public async Task<string> RestartAsync(IGuild guild)
+        {
+            if (!_gameStarted.TryGetValue(guild.Id, out var gameStarted) || !gameStarted)
+            {
+                return "**:no_entry_sign: Game did not started**";
+            }
+
+            _turn[guild.Id] = 0;
+            _playerTurns[guild.Id] = new int[9];
+
+            await LogService.InfoAsync("TicTacToe game restarted");
+            return ":ballot_box_with_check: **Game successfully restarted**";
+        }
+
         public async Task<string> EndAsync(IGuild guild)
         {
             if (!_gameStarted.TryGetValue(guild.Id, out var gameStarted) || !gameStarted)

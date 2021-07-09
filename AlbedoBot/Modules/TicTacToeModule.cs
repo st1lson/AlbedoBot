@@ -28,6 +28,14 @@ namespace AlbedoBot.Modules
             await ReplyAsync(await TicTacToeService.TurnAsync(Context.Guild, Context.User as IGuildUser, position - 1));
         }
 
+        [Command("restart")]
+        [Summary("Restart the current game")]
+
+        public async Task Restart()
+        {
+            await ReplyAsync(await TicTacToeService.RestartAsync(Context.Guild));
+        }
+
         [Command("end")]
         [Summary("Ends current game")]
 
