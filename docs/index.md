@@ -16,6 +16,11 @@
   * Command ***!hi*** (or alias ***!hello***) simple hello command
   * Command ***!roll*** (or alias ***!spin***) used to get a random value in selected range
   * Command ***!flip*** (or alias ***!coin***) used to get a random side of the coin
+* Tic Tac Toe module commands
+  * Command ***!start*** (or alias ***!play***) used to start a new game
+  * Command ***!turn*** used to make a turn
+  * Command ***!restart*** used to start a new game between two current players
+  * Command ***!end*** used to end a current game
 
 ## Features
 * Intuitive command syntax 
@@ -27,4 +32,7 @@
 * Text commands
   * You can flip a coin
   * You can roll a random number between 0 and 100
+* Tic Tac Toe commands
+  * Ability to play for two players
+  * Visualisation of the current game board
 * And much more will be added later
