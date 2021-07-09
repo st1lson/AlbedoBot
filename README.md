@@ -14,6 +14,9 @@
 * Text commands
   * You can flip a coin
   * You can roll a random number between 0 and 100
+* Tic Tac Toe commands
+  * Ability to play for two players
+  * Visualisation of the current game board
 * And much more will be added later
 ## :dragon_face: Author
 * [st1lson](https://github.com/st1lson) - Owner
