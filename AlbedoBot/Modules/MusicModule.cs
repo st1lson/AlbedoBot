@@ -124,13 +124,20 @@ namespace AlbedoBot.Modules
             await ReplyAsync(await MusicService.RepeatAsync(Context.Guild));
         }
 
-
         [Command("clear")]
         [Summary("Command to clear the queue")]
 
         public async Task Clear()
         {
             await ReplyAsync(await MusicService.ClearAsync(Context.Guild));
+        }
+
+        [Command("shuffle")]
+        [Summary("Command to shuffle the queue")]
+
+        public async Task Shuffle()
+        {
+            await ReplyAsync(await MusicService.ShuffleAsync(Context.Guild));
         }
     }
 }

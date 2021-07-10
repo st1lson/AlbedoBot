@@ -460,7 +460,37 @@ namespace AlbedoBot.Services
                 return exception.Message;
             }
         }
-        
+
+        public async Task<string> ShuffleAsync(IGuild guild)
+        {
+            if (!_lavaNode.HasPlayer(guild))
+            {
+                return "**I'm not connected to a voice channel**";
+            }
+
+            try
+            {
+                var player = _lavaNode.GetPlayer(guild);
+                if (player is null)
+                {
+                    return "**Are you sure you are using a bot right now?**";
+                }
+
+                if (player.Queue.Count > 0)
+                {
+                    player.Queue.Shuffle();
+                    return ":ballot_box_with_check: **Queue was successfully shuffled**";
+                }
+
+                return ":no_entry_sign: **Queue is empty**";
+            }
+            catch (Exception exception)
+            {
+                await LogService.ExceptionAsync(exception);
+                return exception.Message;
+            }
+        }
+
         public async Task TrackEnded(TrackEndedEventArgs trackEnded)
         {
             if (!trackEnded.Reason.ShouldPlayNext())
