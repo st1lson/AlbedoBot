@@ -196,14 +196,13 @@ namespace AlbedoBot.Services
                     int second = 0;
                     for (int i = 0; i < 3; i++)
                     {
-                        switch (playerTurns[winState[i]])
+                        if (playerTurns[winState[i]] == 1)
                         {
-                            case 1:
-                                first++;
-                                break;
-                            case 2:
-                                second++;
-                                break;
+                            first++;
+                        }
+                        else if (playerTurns[winState[i]] == 2)
+                        {
+                            second++;
                         }
                     }
 

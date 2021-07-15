@@ -320,7 +320,7 @@ namespace AlbedoBot.Services
                             stringBuilder.Append($"`{trackIndex++}` - [**{track.Title}**]({track.Url}) | `Time left: {track.Duration - track.Position:hh\\:mm\\:ss}`\n");
                         }
 
-                        return await EmbedService.QueueEmbed("Queue", stringBuilder.ToString(), Color.DarkBlue);
+                        return await EmbedService.QueueEmbed("Queue", stringBuilder.ToString(), Color.DarkGrey);
                     }
                 }
                 
@@ -328,6 +328,7 @@ namespace AlbedoBot.Services
             }
             catch (Exception exception)
             {
+                await LogService.ExceptionAsync(exception);
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
