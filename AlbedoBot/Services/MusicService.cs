@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
@@ -302,29 +303,31 @@ namespace AlbedoBot.Services
                 {
                     return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
                 }
-
+                
                 if (player.PlayerState is PlayerState.Playing)
                 {
-                    var track = player.Track;
-                    var embed = new EmbedFieldBuilder[player.Queue.Count + 1];
-                    int pos = 0;
-                    embed = await EmbedService.AppendQueue(embed, track.Title, track.Url, $"{(track.Duration - track.Position):hh\\:mm\\:ss}", pos++);
-                    if (player.Queue.Count != 0)
+                    var stringBuilder = new StringBuilder();
+                    if (player.Queue.Count < 1 && player.Track is not null)
                     {
-                        foreach (var lavaTrack in player.Queue)
-                        {
-                            embed = await EmbedService.AppendQueue(embed, lavaTrack.Title, lavaTrack.Url, $"{(lavaTrack.Duration - lavaTrack.Position):hh\\:mm\\:ss}", pos++);
-                        }
+                        return await NowAsync(guild);
                     }
+                    else
+                    {
+                        stringBuilder.Append($"**Now Playing**\n[**{player.Track?.Title}**]({player.Track?.Url}) | `Time left: {player.Track?.Duration - player.Track?.Position:hh\\:mm\\:ss}`\n**In queue**\n");
+                        var trackIndex = 1;
+                        foreach (var track in player.Queue)
+                        {
+                            stringBuilder.Append($"`{trackIndex++}` - [**{track.Title}**]({track.Url}) | `Time left: {track.Duration - track.Position:hh\\:mm\\:ss}`\n");
+                        }
 
-                    return await EmbedService.QueueEmbed(embed);
+                        return await EmbedService.QueueEmbed("Queue", stringBuilder.ToString(), Color.DarkBlue);
+                    }
                 }
-
-                return await EmbedService.ErrorEmbed("No connection", "No tracks in queue", Color.DarkBlue);
+                
+                return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", "Player stopped", Color.Red);
             }
             catch (Exception exception)
             {
-                await LogService.ExceptionAsync(exception);
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
