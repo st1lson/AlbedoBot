@@ -307,7 +307,7 @@ namespace AlbedoBot.Services
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     var stringBuilder = new StringBuilder();
-                    if (player.Queue.Count < 1 && player.Track is not null)
+                    if (player.Queue.Count < 1 && player.Track != null)
                     {
                         return await NowAsync(guild);
                     }

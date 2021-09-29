@@ -31,7 +31,7 @@ namespace AlbedoBot.Modules
         public async Task Play([Remainder] string trackTitle)
         {
             var user = Context.User as SocketGuildUser;
-            if (user is not null && !MusicService.Joined(user.Guild))
+            if (user != null && !MusicService.Joined(user.Guild))
             {
                 var joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel);
                 await ReplyAsync(joinResult);
