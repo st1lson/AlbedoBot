@@ -200,7 +200,12 @@ namespace AlbedoBot.Services
                 {
                     _timeLeft[player.VoiceChannel.Id] = timeLeft - player.Track.Duration;
                 }
-                
+
+                if (_repeatTokens.TryGetValue(player.VoiceChannel.Id, out var repeatToken) && repeatToken)
+                {
+                    _repeatTokens[player.VoiceChannel.Id] = false;
+                }
+
                 if (player.Queue.Count == 0 && player.PlayerState == PlayerState.Playing)
                 {
                     await player.StopAsync();
@@ -533,6 +538,18 @@ namespace AlbedoBot.Services
 
             value.Cancel(true);
             await LogService.InfoAsync("Auto disconnect has been cancelled!");
+        }
+
+        public async Task TrackException(TrackExceptionEventArgs arg)
+        {
+            await LogService.LogAsync($"Track {arg.Track.Title} threw an exception");
+            arg.Player.Queue.Enqueue(arg.Track);
+        }
+
+        public async Task TrackStuck(TrackStuckEventArgs arg)
+        {
+            await LogService.LogAsync($"Track {arg.Track.Title} got stuck");
+            arg.Player.Queue.Enqueue(arg.Track);
         }
 
         private async Task InitiateDisconnectAsync(LavaPlayer player, TimeSpan timeSpan)

@@ -50,6 +50,8 @@ namespace AlbedoBot.Core
             _lavaNode.OnLog += LogAsync;
             _lavaNode.OnTrackStarted += _musicService.TrackStarted;
             _lavaNode.OnTrackEnded += _musicService.TrackEnded;
+            _lavaNode.OnTrackException += _musicService.TrackException;
+            _lavaNode.OnTrackStuck += _musicService.TrackStuck;
         }
 
         private async Task ReadyAsync()
