@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Discord;
+using System;
 using System.Threading.Tasks;
-using Discord;
 
 namespace AlbedoBot.Services
 {
@@ -22,7 +22,7 @@ namespace AlbedoBot.Services
                 .AddField("Duration", duration, true)
                 .AddField("Until play", timeLeft, true)
                 .WithFooter(new EmbedFooterBuilder().Text = "Albedo bot").Build()));
-            
+
             return embed;
         }
 
@@ -32,7 +32,7 @@ namespace AlbedoBot.Services
                 .WithTitle(title)
                 .WithDescription(description)
                 .WithColor(color).Build()));
-            
+
             return embed;
         }
 

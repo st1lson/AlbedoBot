@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading.Tasks;
-using AlbedoBot.Handlers;
+﻿using AlbedoBot.Handlers;
 using AlbedoBot.Services;
-using Victoria;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Threading.Tasks;
+using Victoria;
 
 namespace AlbedoBot.Core
 {

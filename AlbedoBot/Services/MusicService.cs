@@ -1,3 +1,5 @@
+using Discord;
+using Discord.WebSocket;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -5,8 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using Victoria;
 using Victoria.Enums;
 using Victoria.EventArgs;
@@ -83,7 +83,7 @@ namespace AlbedoBot.Services
                 {
                     return await EmbedService.ErrorEmbed("No matches found", $"No matches were found for `{trackTitle}`", Color.DarkPurple);
                 }
-                
+
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     player.Queue.Enqueue(track);
@@ -91,7 +91,7 @@ namespace AlbedoBot.Services
                     {
                         _timeLeft[player.VoiceChannel.Id] = timeLeft + track.Duration;
                     }
-                    
+
                     return await EmbedService.Embed("Added to the queue", track.Title, track.Url, YouTubeService.GetThumbnail(track.Url), player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{(timeLeft - player.Track.Position):hh\\:mm\\:ss}", Color.Green);
                 }
                 else
@@ -106,8 +106,8 @@ namespace AlbedoBot.Services
                     {
                         _timeLeft[player.VoiceChannel.Id] = TimeSpan.Zero;
                     }
-                    
-                    return  await EmbedService.Embed("Now playing", track.Title, track.Url, YouTubeService.GetThumbnail(track.Url), player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{TimeSpan.Zero:hh\\:mm\\:ss}", Color.Green);
+
+                    return await EmbedService.Embed("Now playing", track.Title, track.Url, YouTubeService.GetThumbnail(track.Url), player.Queue.Count, $"{track.Duration:hh\\:mm\\:ss}", $"{TimeSpan.Zero:hh\\:mm\\:ss}", Color.Green);
                 }
             }
             catch (Exception exception)
@@ -165,7 +165,7 @@ namespace AlbedoBot.Services
                 {
                     return ":ballot_box_with_check: **Player already resumed**";
                 }
-                
+
                 return ":no_entry_sign: **No tracks to resume**";
             }
             catch (Exception exception)
@@ -174,7 +174,7 @@ namespace AlbedoBot.Services
                 return exception.Message;
             }
         }
-        
+
         public async Task<string> SkipAsync(IGuild guild)
         {
             if (!_lavaNode.HasPlayer(guild))
@@ -308,7 +308,7 @@ namespace AlbedoBot.Services
                 {
                     return await EmbedService.ErrorEmbed("No connection", "Are you sure you are using a bot right now?", Color.DarkBlue);
                 }
-                
+
                 if (player.PlayerState is PlayerState.Playing)
                 {
                     var stringBuilder = new StringBuilder();
@@ -328,7 +328,7 @@ namespace AlbedoBot.Services
                         return await EmbedService.QueueEmbed("Queue", stringBuilder.ToString(), Color.DarkGrey);
                     }
                 }
-                
+
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", "Player stopped", Color.Red);
             }
             catch (Exception exception)
@@ -369,7 +369,7 @@ namespace AlbedoBot.Services
                 return await EmbedService.ErrorEmbed("Something going wrong :no_entry_sign:", exception.Message, Color.Red);
             }
         }
-        
+
         public async Task<string> SetVolumeAsync(IGuild guild, int volumeValue)
         {
             if (volumeValue < 0 || volumeValue > 200)
@@ -380,7 +380,7 @@ namespace AlbedoBot.Services
             try
             {
                 var player = _lavaNode.GetPlayer(guild);
-                await player.UpdateVolumeAsync((ushort) volumeValue);
+                await player.UpdateVolumeAsync((ushort)volumeValue);
                 await LogService.InfoAsync($"Volume is set to {volumeValue}");
                 return $":ballot_box_with_check: **Volume is successfully set to {volumeValue}**";
             }
@@ -418,7 +418,7 @@ namespace AlbedoBot.Services
                         _repeatTokens.TryUpdate(player.VoiceChannel.Id, !repeat, repeat);
                         repeat = _repeatTokens[player.VoiceChannel.Id];
                     }
-                    
+
                     return repeat ? $":ballot_box_with_check: **Repeat was successfully enabled**" : ":ballot_box_with_check: **Repeat was successfully disabled**";
                 }
                 else
@@ -460,7 +460,7 @@ namespace AlbedoBot.Services
 
                     return ":no_entry_sign: **Queue is empty**";
                 }
-                
+
                 return ":no_entry_sign: **Queue is empty**";
             }
             catch (Exception exception)
@@ -514,7 +514,7 @@ namespace AlbedoBot.Services
                 await player.PlayAsync(currentTrack);
                 return;
             }
-            
+
             if (!player.Queue.TryDequeue(out var track))
             {
                 _ = InitiateDisconnectAsync(player, TimeSpan.FromMinutes(5));

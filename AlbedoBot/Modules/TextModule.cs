@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Discord.Commands;
+using System;
 using System.Threading.Tasks;
-using Discord.Commands;
 
 namespace AlbedoBot.Modules
 {
@@ -27,7 +27,7 @@ namespace AlbedoBot.Modules
                 await ReplyAsync(":no_entry_sign: **Impossible operation**");
                 return;
             }
-            
+
             Random random = new Random();
             await ReplyAsync($"**You got** `{random.Next(upper)}/{upper}`");
         }
@@ -35,7 +35,7 @@ namespace AlbedoBot.Modules
         [Command("flip")]
         [Alias("coin")]
         [Summary("Command to get a random side of the coin")]
-        
+
         public async Task Flip()
         {
             Random random = new Random();

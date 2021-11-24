@@ -1,11 +1,11 @@
-﻿using System;
-using System.Reflection;
-using AlbedoBot.Services;
-using System.Threading.Tasks;
+﻿using AlbedoBot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace AlbedoBot.Handlers
 {

@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using AlbedoBot.Services;
+﻿using AlbedoBot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using System.Threading.Tasks;
 
 namespace AlbedoBot.Modules
 {
@@ -20,7 +20,7 @@ namespace AlbedoBot.Modules
             {
                 return;
             }
-            
+
             await ReplyAsync(await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel));
         }
 
@@ -62,7 +62,7 @@ namespace AlbedoBot.Modules
         {
             await ReplyAsync(await MusicService.ResumeAsync(Context.Guild));
         }
-        
+
         [Command("volume")]
         [Summary("Command to set player volume")]
 
@@ -96,7 +96,7 @@ namespace AlbedoBot.Modules
         {
             await ReplyAsync(embed: await MusicService.QueueAsync(Context.Guild));
         }
-        
+
         [Command("left")]
         [Alias("time")]
         [Summary("Command to check the time to the end of the current track")]

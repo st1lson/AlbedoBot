@@ -18,7 +18,7 @@ namespace AlbedoBot.Services
             }
             else if (url.IndexOf("/v/", StringComparison.Ordinal) > 0)
             {
-                string strVideoCode = url.Substring(url.IndexOf("/v/", StringComparison.Ordinal) + 3);    
+                string strVideoCode = url.Substring(url.IndexOf("/v/", StringComparison.Ordinal) + 3);
                 int ind = strVideoCode.IndexOf("?", StringComparison.Ordinal);
                 thumbnail = strVideoCode.Substring(0, ind == -1 ? strVideoCode.Length : ind);
             }
@@ -30,7 +30,7 @@ namespace AlbedoBot.Services
             {
                 thumbnail = url.Split("/")[1];
             }
-            
+
             return "https://img.youtube.com/vi/" + thumbnail + "/mqdefault.jpg";
         }
     }

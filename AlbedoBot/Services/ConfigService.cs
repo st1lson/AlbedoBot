@@ -1,7 +1,7 @@
-﻿using System.IO;
-using System.Threading.Tasks;
-using AlbedoBot.Core;
+﻿using AlbedoBot.Core;
 using Newtonsoft.Json;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace AlbedoBot.Services
 {
