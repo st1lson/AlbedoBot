@@ -21,20 +21,21 @@ namespace AlbedoBot.Services
             {
                 await CreateFile();
             }
-            var data = await File.ReadAllTextAsync(Path);
+
+            string data = await File.ReadAllTextAsync(Path);
             Config = JsonConvert.DeserializeObject<Config>(data);
         }
 
-        private Task CreateFile()
+        private static Task CreateFile()
         {
-            var config = new Config
+            Config config = new()
             {
                 Token = "",
                 Prefix = "!",
                 GameStatus = ""
             };
 
-            var data = JsonConvert.SerializeObject(config);
+            string data = JsonConvert.SerializeObject(config);
             File.WriteAllText(Path, data);
             return Task.CompletedTask;
         }

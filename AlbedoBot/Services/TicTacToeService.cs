@@ -26,7 +26,7 @@ namespace AlbedoBot.Services
 
         public async Task<string> StartAsync(IGuild guild, IGuildUser firstPlayer, IGuildUser secondPlayer)
         {
-            if (_gameStarted.TryGetValue(guild.Id, out var gameStarted) && gameStarted)
+            if (_gameStarted.TryGetValue(guild.Id, out bool isGameStarted) && isGameStarted)
             {
                 return "**:no_entry_sign: Game already started**";
             }
@@ -42,83 +42,86 @@ namespace AlbedoBot.Services
 
         public async Task<string> TurnAsync(IGuild guild, IGuildUser sender, int position)
         {
-            if (!_gameStarted.TryGetValue(guild.Id, out var gameStarted) || !gameStarted)
+            if (!_gameStarted.TryGetValue(guild.Id, out bool isGameStarted) || !isGameStarted)
             {
                 return "**:no_entry_sign: Game did not started**";
             }
 
-            if (_turn.TryGetValue(guild.Id, out var turn))
+            if (!_turn.TryGetValue(guild.Id, out int turn))
             {
-                if (turn % 2 == 0)
-                {
-                    if (_firstPlayer.TryGetValue(guild.Id, out var firstPlayer) && !firstPlayer.Equals(sender))
-                    {
-                        return "**Not your turn**";
-                    }
-
-                    if (_playerTurns.TryGetValue(guild.Id, out var playerTurns) && playerTurns[position] == 0)
-                    {
-                        playerTurns[position] = 1;
-                        _turn[guild.Id]++;
-                        await LogService.InfoAsync($"Turn [{position}] was successfully done.");
-                        var table = await CreateTable(guild);
-                        if (CheckForWin(guild))
-                        {
-                            await LogService.InfoAsync($"Winner is {firstPlayer?.Nickname}");
-                            return $"{table}\n**Winner is **{firstPlayer?.Mention}";
-                        }
-
-                        if (_turn[guild.Id] == 9)
-                        {
-                            await EndAsync(guild);
-                            return $"{table}\n**Draw**";
-                        }
-
-                        return table;
-                    }
-
-                    await LogService.InfoAsync("This position already captured");
-                    return "**This position already captured**";
-                }
-                else
-                {
-                    if (_secondPlayer.TryGetValue(guild.Id, out var secondPlayer) && !secondPlayer.Equals(sender))
-                    {
-                        return "**Not your turn**";
-                    }
-
-                    if (_playerTurns.TryGetValue(guild.Id, out var playerTurns) && playerTurns[position] == 0)
-                    {
-                        playerTurns[position] = 2;
-                        _turn[guild.Id]++;
-                        await LogService.InfoAsync($"Turn [{position}] was successfully done.");
-                        var table = await CreateTable(guild);
-                        if (CheckForWin(guild))
-                        {
-                            await LogService.InfoAsync($"Winner is {secondPlayer?.Nickname}");
-                            return $"{table}**Winner is **{secondPlayer?.Mention}";
-                        }
-
-                        if (_turn[guild.Id] == 9)
-                        {
-                            await EndAsync(guild);
-                            return $"{table}\n**Draw**";
-                        }
-
-                        return table;
-                    }
-
-                    await LogService.InfoAsync("This position already captured");
-                    return "**This position already captured**";
-                }
+                return ":no_entry_sign: **Something going wrong.**";
             }
 
-            return ":no_entry_sign: **Something going wrong.**";
+            if (turn % 2 == 0)
+            {
+                if (_firstPlayer.TryGetValue(guild.Id, out IGuildUser firstPlayer) && !firstPlayer.Equals(sender))
+                {
+                    return "**Not your turn**";
+                }
+
+                if (_playerTurns.TryGetValue(guild.Id, out int[] playerTurns) && playerTurns[position] == 0)
+                {
+                    playerTurns[position] = 1;
+                    _turn[guild.Id]++;
+                    await LogService.InfoAsync($"Turn [{position}] was successfully done.");
+                    string table = await CreateTable(guild);
+                    if (CheckForWin(guild))
+                    {
+                        await LogService.InfoAsync($"Winner is {firstPlayer?.Nickname}");
+                        return $"{table}\n**Winner is **{firstPlayer?.Mention}";
+                    }
+
+                    if (_turn[guild.Id] != 9)
+                    {
+                        return table;
+                    }
+
+                    await EndAsync(guild);
+                    return $"{table}\n**Draw**";
+
+                }
+
+                await LogService.InfoAsync("This position already captured");
+                return "**This position already captured**";
+            }
+            else
+            {
+                if (_secondPlayer.TryGetValue(guild.Id, out IGuildUser secondPlayer) && !secondPlayer.Equals(sender))
+                {
+                    return "**Not your turn**";
+                }
+
+                if (_playerTurns.TryGetValue(guild.Id, out int[] playerTurns) && playerTurns[position] == 0)
+                {
+                    playerTurns[position] = 2;
+                    _turn[guild.Id]++;
+                    await LogService.InfoAsync($"Turn [{position}] was successfully done.");
+                    string table = await CreateTable(guild);
+                    if (CheckForWin(guild))
+                    {
+                        await LogService.InfoAsync($"Winner is {secondPlayer?.Nickname}");
+                        return $"{table}**Winner is **{secondPlayer?.Mention}";
+                    }
+
+                    if (_turn[guild.Id] != 9)
+                    {
+                        return table;
+                    }
+
+                    await EndAsync(guild);
+                    return $"{table}\n**Draw**";
+
+                }
+
+                await LogService.InfoAsync("This position already captured");
+                return "**This position already captured**";
+            }
+
         }
 
         public async Task<string> RestartAsync(IGuild guild)
         {
-            if (!_gameStarted.TryGetValue(guild.Id, out var gameStarted) || !gameStarted)
+            if (!_gameStarted.TryGetValue(guild.Id, out bool isGameStarted) || !isGameStarted)
             {
                 return "**:no_entry_sign: Game did not started**";
             }
@@ -132,7 +135,7 @@ namespace AlbedoBot.Services
 
         public async Task<string> EndAsync(IGuild guild)
         {
-            if (!_gameStarted.TryGetValue(guild.Id, out var gameStarted) || !gameStarted)
+            if (!_gameStarted.TryGetValue(guild.Id, out bool isGameStarted) || !isGameStarted)
             {
                 return "**:no_entry_sign: Game did not started**";
             }
@@ -149,25 +152,18 @@ namespace AlbedoBot.Services
 
         private async Task<string> CreateTable(IGuild guild)
         {
-            var table = new StringBuilder();
-            if (_playerTurns.TryGetValue(guild.Id, out var playerTurns))
+            StringBuilder table = new();
+            if (_playerTurns.TryGetValue(guild.Id, out int[] playerTurns))
             {
                 int n = 0;
                 for (int i = 0; i < playerTurns.GetLength(0); i++)
                 {
-                    string value;
-                    if (playerTurns[i] == 1)
+                    string value = playerTurns[i] switch
                     {
-                        value = ":x:";
-                    }
-                    else if (playerTurns[i] == 2)
-                    {
-                        value = ":o:";
-                    }
-                    else
-                    {
-                        value = "      ";
-                    }
+                        1 => ":x:",
+                        2 => ":o:",
+                        _ => "      "
+                    };
 
                     if (n % 3 == 0)
                     {
@@ -188,35 +184,37 @@ namespace AlbedoBot.Services
 
         private bool CheckForWin(IGuild guild)
         {
-            if (_playerTurns.TryGetValue(guild.Id, out var playerTurns))
+            if (!_playerTurns.TryGetValue(guild.Id, out int[] playerTurns))
             {
-                foreach (var winState in _winState)
-                {
-                    int first = 0;
-                    int second = 0;
-                    for (int i = 0; i < 3; i++)
-                    {
-                        if (playerTurns[winState[i]] == 1)
-                        {
-                            first++;
-                        }
-                        else if (playerTurns[winState[i]] == 2)
-                        {
-                            second++;
-                        }
-                    }
+                return false;
+            }
 
-                    if (first == 3 || second == 3)
+            foreach (int[] winState in _winState)
+            {
+                int first = 0;
+                int second = 0;
+                for (int i = 0; i < 3; i++)
+                {
+                    if (playerTurns[winState[i]] == 1)
                     {
-                        return true;
+                        first++;
                     }
+                    else if (playerTurns[winState[i]] == 2)
+                    {
+                        second++;
+                    }
+                }
+
+                if (first == 3 || second == 3)
+                {
+                    return true;
                 }
             }
 
             return false;
         }
 
-        private int[][] InitializeWinState()
+        private static int[][] InitializeWinState()
         {
             int[][] winState = new int[8][];
             winState[0] = new[] { 0, 1, 2 };

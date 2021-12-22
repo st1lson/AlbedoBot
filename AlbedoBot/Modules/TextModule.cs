@@ -1,6 +1,7 @@
 ﻿using Discord.Commands;
 using System;
 using System.Threading.Tasks;
+using Discord.WebSocket;
 
 namespace AlbedoBot.Modules
 {
@@ -12,7 +13,7 @@ namespace AlbedoBot.Modules
 
         public async Task Hello()
         {
-            var user = Context.User;
+            SocketUser user = Context.User;
             await ReplyAsync($"**Welcome back,** {user.Mention}");
         }
 
@@ -28,7 +29,7 @@ namespace AlbedoBot.Modules
                 return;
             }
 
-            Random random = new Random();
+            Random random = new();
             await ReplyAsync($"**You got** `{random.Next(upper)}/{upper}`");
         }
 
@@ -38,7 +39,7 @@ namespace AlbedoBot.Modules
 
         public async Task Flip()
         {
-            Random random = new Random();
+            Random random = new();
             int flip = random.Next(2);
             if (flip == 0)
             {

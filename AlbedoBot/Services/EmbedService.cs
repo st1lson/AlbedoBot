@@ -13,7 +13,7 @@ namespace AlbedoBot.Services
                 timeLeft = "Now";
             }
 
-            var embed = await Task.Run(() => (new EmbedBuilder()
+            Embed embed = await Task.Run(() => (new EmbedBuilder()
                 .WithTitle(action)
                 .WithThumbnailUrl(thumbnailUrl)
                 .WithDescription($"[**{title}**]({url})")
@@ -28,7 +28,7 @@ namespace AlbedoBot.Services
 
         public static async Task<Embed> QueueEmbed(string title, string description, Color color)
         {
-            var embed = await Task.Run(() => (new EmbedBuilder()
+            Embed embed = await Task.Run(() => (new EmbedBuilder()
                 .WithTitle(title)
                 .WithDescription(description)
                 .WithColor(color).Build()));
@@ -38,7 +38,7 @@ namespace AlbedoBot.Services
 
         public static async Task<Embed> NowEmbed(string action, string title, string url, string author, string duration, Color color)
         {
-            var embed = await Task.Run(() => (new EmbedBuilder()
+            Embed embed = await Task.Run(() => (new EmbedBuilder()
                 .WithTitle(action)
                 .WithDescription($"[**{title}**]({url})")
                 .WithColor(color)
@@ -51,7 +51,7 @@ namespace AlbedoBot.Services
 
         public static async Task<Embed> ErrorEmbed(string title, string exception, Color color)
         {
-            var embed = await Task.Run(() => (new EmbedBuilder()
+            Embed embed = await Task.Run(() => (new EmbedBuilder()
                 .WithTitle(title)
                 .WithDescription(exception)
                 .WithColor(color)

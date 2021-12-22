@@ -30,17 +30,13 @@ namespace AlbedoBot.Services
 
         private static string Tag(string sender)
         {
-            switch (sender)
+            return sender switch
             {
-                case "log":
-                    return "[LOGM]";
-                case "info":
-                    return "[INFO]";
-                case "exception":
-                    return "[EXCP]";
-            }
-
-            return "[EROR]";
+                "log" => "[LOGM]",
+                "info" => "[INFO]",
+                "exception" => "[EXCP]",
+                _ => "[EROR]",
+            };
         }
     }
 }

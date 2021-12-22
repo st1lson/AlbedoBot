@@ -20,7 +20,6 @@ namespace AlbedoBot.Handlers
             _client = services.GetRequiredService<DiscordSocketClient>();
             _commands = services.GetRequiredService<CommandService>();
             _services = services;
-
             SubscribeEvents();
         }
 
@@ -47,15 +46,15 @@ namespace AlbedoBot.Handlers
                 return Task.CompletedTask;
             }
 
-            var userMessage = socketMessage as SocketUserMessage;
+            SocketUserMessage userMessage = socketMessage as SocketUserMessage;
             int argPos = 0;
             if (!userMessage.HasStringPrefix(ConfigService.Config.Prefix, ref argPos))
             {
                 return Task.CompletedTask;
             }
 
-            var context = new SocketCommandContext(_client, userMessage);
-            var result = _commands.ExecuteAsync(context, argPos, _services);
+            SocketCommandContext context = new SocketCommandContext(_client, userMessage);
+            Task<IResult> result = _commands.ExecuteAsync(context, argPos, _services);
             return result;
         }
     }

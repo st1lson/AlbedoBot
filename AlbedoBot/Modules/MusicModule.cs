@@ -15,8 +15,7 @@ namespace AlbedoBot.Modules
 
         public async Task Join()
         {
-            var user = Context.User as SocketGuildUser;
-            if (user is null)
+            if (Context.User is not SocketGuildUser user)
             {
                 return;
             }
@@ -30,10 +29,10 @@ namespace AlbedoBot.Modules
 
         public async Task Play([Remainder] string trackTitle)
         {
-            var user = Context.User as SocketGuildUser;
+            SocketGuildUser user = Context.User as SocketGuildUser;
             if (user != null && !MusicService.Joined(user.Guild))
             {
-                var joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel);
+                string joinResult = await MusicService.JoinAsync(Context.Guild, user.VoiceChannel, Context.Channel as ITextChannel);
                 await ReplyAsync(joinResult);
                 if (joinResult.Equals(":no_entry_sign: **You need to join to a voice channel!**") || joinResult.Equals(":no_entry_sign: **I'm already connected to a voice channel!**"))
                 {

@@ -73,7 +73,7 @@ namespace AlbedoBot.Core
         }
 
 
-        private ServiceProvider ConfigureServices() =>
+        private static ServiceProvider ConfigureServices() =>
             new ServiceCollection()
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
